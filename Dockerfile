@@ -37,9 +37,10 @@ RUN apt-get update && \
 
 # We'll update this path after finding the binary
 COPY --from=builder /build/odyssey/build/sources/odyssey /usr/local/bin/
-COPY config/odyssey.conf /etc/odyssey/odyssey.conf
 
-WORKDIR /etc/odyssey
+RUN mkdir /etc/odyssey
+
+COPY config/odyssey.conf /etc/odyssey/odyssey.conf
 
 EXPOSE 6432
 
