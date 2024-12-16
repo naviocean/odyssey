@@ -1,5 +1,5 @@
 # Build stage
-FROM ubuntu:20.04 as builder
+FROM ubuntu:20.04 AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -18,12 +18,14 @@ RUN apt-get update && \
 WORKDIR /build
 RUN git clone -b master https://github.com/yandex/odyssey.git && \
     cd odyssey && \
+    ls -la && \
     mkdir build && \
     cd build && \
     cmake -DCMAKE_BUILD_TYPE=Release \
           -DPostgreSQL_TYPE_INCLUDE_DIR=/usr/include/postgresql \
           .. && \
-    make
+    make && \
+    ls -la  # Check where binary is created
 
 # Final stage
 FROM ubuntu:20.04
@@ -34,10 +36,11 @@ RUN apt-get update && \
     libpq5 \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /build/odyssey/build/odyssey /usr/local/bin/
+# Copy binary using correct path after checking ls output
+COPY --from=builder /build/odyssey/build/sources/odyssey /usr/local/bin/
+COPY config/odyssey.conf /etc/odyssey/odyssey.conf
 
 WORKDIR /etc/odyssey
-RUN mkdir -p /etc/odyssey
 
 EXPOSE 6432
 
