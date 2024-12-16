@@ -10,17 +10,16 @@ RUN apt-get update && \
     libssl-dev \
     postgresql-client \
     libpq-dev \
-    postgresql-server-dev-all \  # Thêm package này
-    pkg-config \                 # Thêm package này
+    postgresql-server-dev-all \
+    pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-# Clone specific version để tránh breaking changes
 RUN git clone -b master https://github.com/yandex/odyssey.git && \
     cd odyssey && \
     mkdir build && \
     cd build && \
     cmake -DCMAKE_BUILD_TYPE=Release \
-          -DPostgreSQL_TYPE_INCLUDE_DIR=/usr/include/postgresql \  # Chỉ định PostgreSQL include dir
+          -DPostgreSQL_TYPE_INCLUDE_DIR=/usr/include/postgresql \
           .. && \
     make && \
     make install
