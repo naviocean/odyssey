@@ -22,9 +22,11 @@ RUN git clone -b master https://github.com/yandex/odyssey.git && \
           -DPostgreSQL_TYPE_INCLUDE_DIR=/usr/include/postgresql \
           .. && \
     make && \
-    make install
+    cp odyssey /usr/local/bin/
 
-WORKDIR /odyssey
+WORKDIR /etc/odyssey
+RUN mkdir -p /etc/odyssey
+
 EXPOSE 6432
 
 CMD ["odyssey", "/etc/odyssey/odyssey.conf"]
