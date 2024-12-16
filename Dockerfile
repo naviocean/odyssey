@@ -1,4 +1,5 @@
-FROM ubuntu:20.04
+# Build stage
+FROM ubuntu:20.04 as builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -14,6 +15,7 @@ RUN apt-get update && \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
+WORKDIR /build
 RUN git clone -b master https://github.com/yandex/odyssey.git && \
     cd odyssey && \
     mkdir build && \
@@ -21,8 +23,18 @@ RUN git clone -b master https://github.com/yandex/odyssey.git && \
     cmake -DCMAKE_BUILD_TYPE=Release \
           -DPostgreSQL_TYPE_INCLUDE_DIR=/usr/include/postgresql \
           .. && \
-    make && \
-    cp odyssey /usr/local/bin/
+    make
+
+# Final stage
+FROM ubuntu:20.04
+
+RUN apt-get update && \
+    apt-get install -y \
+    libssl1.1 \
+    libpq5 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /build/odyssey/build/odyssey /usr/local/bin/
 
 WORKDIR /etc/odyssey
 RUN mkdir -p /etc/odyssey
